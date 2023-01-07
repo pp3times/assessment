@@ -32,7 +32,61 @@ func (r *Repository) SetupRoutes(app *fiber.App) {
 
 	app.Post("/expenses", r.CreateExpense)
 
+	app.Put("/expenses/:id", r.UpdateExpenses)
+
 	app.Get("/expenses/:id", r.GetExpenseByID)
+
+}
+
+// Update Expense
+
+func (r *Repository) UpdateExpenses(context *fiber.Ctx) error {
+
+	id := context.Params("id")
+
+	if id == "" {
+
+		context.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+
+			"message": "id cannot be empty",
+		})
+
+		return nil
+
+	}
+
+	// expenseModel := &models.Expenses{}
+
+	expense := Expenses{}
+
+	err := context.BodyParser(&expense)
+
+	if err != nil {
+
+		context.Status(http.StatusUnprocessableEntity).JSON(
+
+			&fiber.Map{"message": "request failed"})
+
+		return err
+
+	}
+
+	err = r.DB.Where("id = ?", id).Updates(&expense).Error
+
+	if err != nil {
+
+		context.Status(http.StatusBadRequest).JSON(&fiber.Map{
+
+			"message": "could not update expense",
+		})
+
+		return err
+
+	}
+
+	context.Status(http.StatusOK).JSON(expense)
+
+	return nil
 
 }
 
