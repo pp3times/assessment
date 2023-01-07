@@ -8,6 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/go-playground/validator/v10"
+
+	"github.com/pp3times/assessment/models"
 )
 
 type Expenses struct {
@@ -29,6 +31,45 @@ type Repository struct {
 func (r *Repository) SetupRoutes(app *fiber.App) {
 
 	app.Post("/expenses", r.CreateExpense)
+
+	app.Get("/expenses/:id", r.GetExpenseByID)
+
+}
+
+// GET Expense By ID
+
+func (r *Repository) GetExpenseByID(context *fiber.Ctx) error {
+
+	id := context.Params("id")
+
+	expenseModel := &models.Expenses{}
+
+	if id == "" {
+
+		context.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+
+			"message": "id cannot be empty",
+		})
+
+		return nil
+
+	}
+
+	err := r.DB.Where("id = ?", id).First(expenseModel).Error
+
+	if err != nil {
+
+		context.Status(http.StatusBadRequest).JSON(
+
+			&fiber.Map{"message": "could not get expense"})
+
+		return err
+
+	}
+
+	context.Status(http.StatusOK).JSON(expenseModel)
+
+	return nil
 
 }
 
