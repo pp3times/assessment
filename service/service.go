@@ -36,6 +36,8 @@ func (r *Repository) SetupRoutes(app *fiber.App) {
 
 	app.Get("/expenses/:id", r.GetExpenseByID)
 
+	app.Get("/expenses", r.GetExpenses)
+
 }
 
 // Update Expense
@@ -122,6 +124,30 @@ func (r *Repository) GetExpenseByID(context *fiber.Ctx) error {
 	}
 
 	context.Status(http.StatusOK).JSON(expenseModel)
+
+	return nil
+
+}
+
+// Get Expenses
+
+func (r *Repository) GetExpenses(context *fiber.Ctx) error {
+
+	expenseModels := &[]models.Expenses{}
+
+	err := r.DB.Find(expenseModels).Error
+
+	if err != nil {
+
+		context.Status(http.StatusBadRequest).JSON(
+
+			&fiber.Map{"message": "could not get expense"})
+
+		return err
+
+	}
+
+	context.Status(http.StatusOK).JSON(expenseModels)
 
 	return nil
 
