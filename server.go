@@ -7,7 +7,6 @@ import (
 	"os/signal"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 	"github.com/pp3times/assessment/models"
 	"github.com/pp3times/assessment/service"
 	"github.com/pp3times/assessment/storage"
@@ -16,13 +15,13 @@ import (
 func main() {
 	fmt.Println("Please use server.go for main file")
 	fmt.Println("start at port:", os.Getenv("PORT"))
-	err := godotenv.Load(".env")
+	// err := godotenv.Load(".env")
 
-	if err != nil {
+	// if err != nil {
 
-		log.Fatal(err)
+	// 	log.Fatal(err)
 
-	}
+	// }
 
 	config := &storage.Config{
 
