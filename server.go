@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -63,10 +64,17 @@ func main() {
 
 	r.SetupRoutes(app)
 
-	// app.Get("/", func(c *fiber.Ctx) error {
-	// 	return c.SendString("Hello, World!")
-	// })
+	// Gracefully shutdown
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 
-	app.Listen(os.Getenv("PORT"))
+	go func() {
+		_ = <-c
+		fmt.Println("Gracefully shutting down...")
+		_ = app.Shutdown()
+	}()
 
+	if err := app.Listen(os.Getenv("PORT")); err != nil {
+		log.Panic(err)
+	}
 }
